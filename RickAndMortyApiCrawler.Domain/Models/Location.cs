@@ -15,5 +15,5 @@ public class Location : BaseEntity
     public string? Url { get; set; }
 
     public DateTime? Created { get; set; }
-    public virtual ICollection<Character> Characters { get; set; }
+    public virtual ICollection<Character>? Characters { get; set; }
 }

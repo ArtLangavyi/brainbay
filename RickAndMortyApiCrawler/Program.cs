@@ -5,8 +5,9 @@ using Microsoft.Extensions.Hosting;
 
 using RickAndMortyApiCrawler;
 using RickAndMortyApiCrawler.Core.Clients;
-using RickAndMortyApiCrawler.Core.Infrastracture;
+using RickAndMortyApiCrawler.Core.Infrastructure;
 using RickAndMortyApiCrawler.Core.Mappers;
+using RickAndMortyApiCrawler.Core.Repositories;
 using RickAndMortyApiCrawler.Data.Context;
 
 using System.Net;
@@ -26,9 +27,12 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
         var rickAndMortyApiSettings = hostContext.Configuration.GetSection("RickAndMortyApiSettings").Get<RickAndMortyApiSettings>();
-        services.AddSingleton(rickAndMortyApiSettings!);
-
         ConfigureHttpClientForRickAndMoprtyApi(services, rickAndMortyApiSettings);
+
+        services.AddSingleton(rickAndMortyApiSettings!);
+        services.AddTransient<IRickAndMortyApiFactory, RickAndMortyApiFactory>();
+
+        services.AddScoped<ILocationRepository, LocationRepository>();
 
     }));
 

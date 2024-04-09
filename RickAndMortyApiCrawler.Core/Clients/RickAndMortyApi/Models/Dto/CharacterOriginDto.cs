@@ -1,8 +1,6 @@
-﻿namespace RickAndMorty.Net.Api.Models.Dto
+﻿namespace RickAndMorty.Net.Api.Models.Dto;
+public class CharacterOriginDto
 {
-    internal class CharacterOriginDto
-    {
-        public string? Name { get; set; }
-        public string? Url { get; set; }
-    }
+    public string? Name { get; set; }
+    public string? Url { get; set; }
 }

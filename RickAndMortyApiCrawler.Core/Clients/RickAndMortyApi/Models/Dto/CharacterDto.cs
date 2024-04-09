@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace RickAndMorty.Net.Api.Models.Dto
-{
-    internal class CharacterDto
+namespace RickAndMorty.Net.Api.Models.Dto;
+    public class CharacterDto
     {
         public int Id { get; set; }
         public required string Name { get; set; }
@@ -25,4 +24,3 @@ namespace RickAndMorty.Net.Api.Models.Dto
         public string? Url { get; set; }
         public string? Created { get; set; }
     }
-}

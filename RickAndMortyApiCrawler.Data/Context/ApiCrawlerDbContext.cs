@@ -13,6 +13,7 @@ public class ApiCrawlerDbContext(DbContextOptions<ApiCrawlerDbContext> options) 
                                                                     convertFromProviderExpression: v => JsonConvert.DeserializeObject<string[]>(v));
     public DbSet<Character> Characters { get; set; }
     public DbSet<CharacterOrigin> CharacterOrigins { get; set; }
+    public DbSet<Location> Locations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

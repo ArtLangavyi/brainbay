@@ -1,8 +1,6 @@
-﻿namespace RickAndMorty.Net.Api.Models.Dto
+﻿namespace RickAndMorty.Net.Api.Models.Dto;
+internal class CharacterLocationResponse
 {
-    internal class CharacterLocationResponse
-    {
-        public string? Name { get; set; }
-        public string? Url { get; set; }
-    }
+    public string? Name { get; set; }
+    public string? Url { get; set; }
 }
