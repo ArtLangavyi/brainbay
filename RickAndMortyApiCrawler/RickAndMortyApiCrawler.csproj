@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RickAndMortyApiCrawler.Core\RickAndMortyApiCrawler.Core.csproj" />
     <ProjectReference Include="..\RickAndMortyApiCrawler.Data\RickAndMortyApiCrawler.Data.csproj" />
   </ItemGroup>
 
