@@ -1,15 +1,10 @@
-﻿using Elastic.Apm.Api;
-
-using RickAndMorty.Net.Api.Models.Dto;
+﻿using RickAndMorty.Net.Api.Models.Dto;
 
 using RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 using RickAndMortyApiCrawler.Core.Helpers;
 using RickAndMortyApiCrawler.Core.Models.ImportCharacter;
 using RickAndMortyApiCrawler.Core.Services.Abstractions;
 
-using System.Collections.Specialized;
-using System.Text;
-using System.Threading;
 using System.Web;
 
 namespace RickAndMortyApiCrawler.Core.Services;
@@ -23,7 +18,7 @@ public partial class ImportService : IImportService
     public async Task ImportCharacterAsync(ImportFilter? importFilter, CancellationToken cancellationToken = default)
     {
         var charactersList = await LoadAndAddNewCharacterAsync(importFilter, cancellationToken);
-        
+
         await SaveCharactersToDb(charactersList, cancellationToken);
     }
 
@@ -51,7 +46,7 @@ public partial class ImportService : IImportService
         using var _httpClient = rickAndMortyApiFactory.MakeHttpClient();
         var charactersList = new List<CharacterResponseResult>();
         var url = rickAndMortyApiSettings.CharactersEndpoint;
-        
+
         url += ApplyFilterToQueryParameters(importFilter, rickAndMortyApiSettings.CharactersEndpoint);
 
         while (!string.IsNullOrEmpty(url))
@@ -64,7 +59,7 @@ public partial class ImportService : IImportService
                 if (charactersResponse is not null)
                 {
                     charactersList.AddRange(charactersResponse.results);
-                    
+
                     url = charactersResponse.info.next;
                 }
                 else
@@ -88,7 +83,7 @@ public partial class ImportService : IImportService
             return url;
         }
 
-        if(!url.Contains("http"))
+        if (!url.Contains("http"))
         {
             url = $"http://doesnmatter.domain/{url}";
         }

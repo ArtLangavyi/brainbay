@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RickAndMortyApiCrawler.Core.Models.ImportCharacter.Enums;
+﻿namespace RickAndMortyApiCrawler.Core.Models.ImportCharacter.Enums;
 public enum ImportFilterStatusEnum
 {
     Alive
