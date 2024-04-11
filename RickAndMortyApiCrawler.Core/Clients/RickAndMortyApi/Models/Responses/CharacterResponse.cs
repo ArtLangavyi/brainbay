@@ -1,8 +1,6 @@
 ﻿using RickAndMorty.Net.Api.Models.Dto;
 
-using System;
-
-namespace RickAndMorty.Net.Api.Models.Responses;
+namespace RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 internal class CharacterResponse
 {
     public int Id { get; set; }
@@ -18,8 +16,6 @@ internal class CharacterResponse
     public string? Gender { get; set; }
 
     public CharacterLocationResponse? Location { get; set; }
-
-    public CharacterOriginResponse? Origin { get; set; }
 
     public string? Image { get; set; }
     public string[]? Episode { get; set; }

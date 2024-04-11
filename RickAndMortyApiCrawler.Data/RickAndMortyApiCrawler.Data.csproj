@@ -24,4 +24,8 @@
     <ProjectReference Include="..\RickAndMortyApiCrawler.Domain\RickAndMortyApiCrawler.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

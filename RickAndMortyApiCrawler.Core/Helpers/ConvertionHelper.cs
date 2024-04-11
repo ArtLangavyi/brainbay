@@ -1,7 +1,4 @@
-﻿
-using RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
-
-namespace RickAndMortyApiCrawler.Core.Helpers;
+﻿namespace RickAndMortyApiCrawler.Core.Helpers;
 
 public class ConversionHelper
 {

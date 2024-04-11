@@ -6,11 +6,9 @@ using RickAndMortyApiCrawler.Core.Mappers;
 using RickAndMortyApiCrawler.Data.Context;
 
 namespace RickAndMortyApiCrawler.Core.Repositories;
-public class LocationRepository : ILocationRepository
+public class LocationRepository(ApiCrawlerDbContext context) : ILocationRepository
 {
-    private readonly ApiCrawlerDbContext _context;
-
-    public LocationRepository(ApiCrawlerDbContext context) => _context = context;
+    private readonly ApiCrawlerDbContext _context = context;
 
     public async Task RemoveAllLocationsAsync(CancellationToken cancellationToken = default)
     {
@@ -36,7 +34,6 @@ public class LocationRepository : ILocationRepository
             var idsList = await _context.Locations.AsNoTracking().Select(obj => obj.ExternalId).ToListAsync(cancellationToken);
 
             var newEntities = locationDtos
-                .Where(obj => !idsList.Contains(obj.ExternalId))
                 .Select(obj => obj.MapToLocation())
                 .ToList();
 

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace RickAndMortyApiCrawler.Domain.Models;
-public class Location 
+public class Location
 {
     [Key]
     public int Id { get; set; }

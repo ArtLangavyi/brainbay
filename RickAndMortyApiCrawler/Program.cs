@@ -13,7 +13,6 @@ using RickAndMortyApiCrawler.Core.Services.Abstractions;
 using RickAndMortyApiCrawler.Data.Context;
 
 using System.Net;
-using System.Threading;
 
 
 Console.WriteLine("Hello, World!");
@@ -32,6 +31,7 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
         var rickAndMortyApiSettings = hostContext.Configuration.GetSection("RickAndMortyApiSettings").Get<RickAndMortyApiSettings>();
+        var AppSettings = hostContext.Configuration.GetSection("AppSettings").Get<AppSettings>();
         ConfigureHttpClientForRickAndMortyApi(services, rickAndMortyApiSettings);
 
         services.AddSingleton(rickAndMortyApiSettings!);
@@ -84,7 +84,8 @@ async Task MonitorForManualRecordAsync()
 
 async Task<bool> CheckForManualRecordAsync()
 {
-    return false;
+    var importService = app.Services.GetRequiredService<IImportService>();
+    return await importService.CheckForManualRecordAsync(cancellationToken);
 }
 
 

@@ -9,7 +9,8 @@ public static class CharacterLocationMapper
 
     public static Location MapToLocation(this CharacterLocationDto model)
     {
-        return new Location() { 
+        return new Location()
+        {
             ExternalId = model.ExternalId,
             Name = model.Name,
             Type = model.Type,

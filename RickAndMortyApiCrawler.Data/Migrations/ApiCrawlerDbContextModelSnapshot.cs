@@ -30,12 +30,6 @@ namespace RickAndMortyApiCrawler.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CharacterOriginId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CharacterOriginId1")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -43,12 +37,15 @@ namespace RickAndMortyApiCrawler.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Image")
-                        .HasMaxLength(2550)
                         .HasColumnType("nvarchar(2550)");
+
+                    b.Property<bool>("IsAddedManual")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LinksToEpisode")
                         .IsUnicode(false)
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("varchar(max)")
+                        .HasColumnName("LinksToEpisodeJson");
 
                     b.Property<int?>("LocationId")
                         .HasColumnType("int");
@@ -66,7 +63,6 @@ namespace RickAndMortyApiCrawler.Data.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Status")
-                        .HasMaxLength(255)
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
@@ -78,37 +74,11 @@ namespace RickAndMortyApiCrawler.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CharacterOriginId");
-
-                    b.HasIndex("CharacterOriginId1");
-
                     b.HasIndex("LocationId");
 
                     b.HasIndex("LocationId1");
 
-                    b.ToTable("Characters");
-                });
-
-            modelBuilder.Entity("RickAndMortyApiCrawler.Domain.Models.CharacterOrigin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Uri")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(2550)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CharacterOrigins");
+                    b.ToTable("Characters", (string)null);
                 });
 
             modelBuilder.Entity("RickAndMortyApiCrawler.Domain.Models.Location", b =>
@@ -130,8 +100,8 @@ namespace RickAndMortyApiCrawler.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LinksToResidents")
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("LinksToResidentsJson");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -148,37 +118,21 @@ namespace RickAndMortyApiCrawler.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("RickAndMortyApiCrawler.Domain.Models.Character", b =>
                 {
-                    b.HasOne("RickAndMortyApiCrawler.Domain.Models.CharacterOrigin", "Origin")
-                        .WithMany()
-                        .HasForeignKey("CharacterOriginId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("RickAndMortyApiCrawler.Domain.Models.CharacterOrigin", null)
-                        .WithMany("Characters")
-                        .HasForeignKey("CharacterOriginId1");
-
                     b.HasOne("RickAndMortyApiCrawler.Domain.Models.Location", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("RickAndMortyApiCrawler.Domain.Models.Location", null)
                         .WithMany("Characters")
                         .HasForeignKey("LocationId1");
 
                     b.Navigation("Location");
-
-                    b.Navigation("Origin");
-                });
-
-            modelBuilder.Entity("RickAndMortyApiCrawler.Domain.Models.CharacterOrigin", b =>
-                {
-                    b.Navigation("Characters");
                 });
 
             modelBuilder.Entity("RickAndMortyApiCrawler.Domain.Models.Location", b =>

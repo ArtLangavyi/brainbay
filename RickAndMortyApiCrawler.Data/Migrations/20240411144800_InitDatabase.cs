@@ -1,45 +1,33 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace RickAndMortyApiCrawler.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitBaseModels : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CharacterOrigins",
+                name: "Locations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Uri = table.Column<string>(type: "nvarchar(2550)", maxLength: 255, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CharacterOrigins", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Location",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExternalId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Dimension = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    LinksToResidents = table.Column<string>(type: "varchar(max)", unicode: false, nullable: true),
+                    LinksToResidentsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Url = table.Column<string>(type: "nvarchar(2550)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Location", x => x.Id);
+                    table.PrimaryKey("PK_Locations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,55 +37,33 @@ namespace RickAndMortyApiCrawler.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Status = table.Column<int>(type: "int", maxLength: 255, nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     Species = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Type = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false),
-                    CharacterOriginId = table.Column<int>(type: "int", nullable: true),
                     LocationId = table.Column<int>(type: "int", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(2550)", maxLength: 2550, nullable: true),
-                    LinksToEpisode = table.Column<string>(type: "varchar(max)", unicode: false, nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(2550)", nullable: true),
+                    LinksToEpisodeJson = table.Column<string>(type: "varchar(max)", unicode: false, nullable: true),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CharacterOriginId1 = table.Column<int>(type: "int", nullable: true),
+                    IsAddedManual = table.Column<bool>(type: "bit", nullable: false),
                     LocationId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Characters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Characters_CharacterOrigins_CharacterOriginId",
-                        column: x => x.CharacterOriginId,
-                        principalTable: "CharacterOrigins",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Characters_CharacterOrigins_CharacterOriginId1",
-                        column: x => x.CharacterOriginId1,
-                        principalTable: "CharacterOrigins",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Characters_Location_LocationId",
+                        name: "FK_Characters_Locations_LocationId",
                         column: x => x.LocationId,
-                        principalTable: "Location",
+                        principalTable: "Locations",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Characters_Location_LocationId1",
+                        name: "FK_Characters_Locations_LocationId1",
                         column: x => x.LocationId1,
-                        principalTable: "Location",
+                        principalTable: "Locations",
                         principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Characters_CharacterOriginId",
-                table: "Characters",
-                column: "CharacterOriginId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Characters_CharacterOriginId1",
-                table: "Characters",
-                column: "CharacterOriginId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Characters_LocationId",
@@ -117,10 +83,7 @@ namespace RickAndMortyApiCrawler.Data.Migrations
                 name: "Characters");
 
             migrationBuilder.DropTable(
-                name: "CharacterOrigins");
-
-            migrationBuilder.DropTable(
-                name: "Location");
+                name: "Locations");
         }
     }
 }

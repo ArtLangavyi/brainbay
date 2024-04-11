@@ -1,13 +1,18 @@
 ﻿using RickAndMorty.Net.Api.Models.Dto;
 
-using RickAndMortyApiCrawler.Core.Services.Abstractions;
 using RickAndMortyApiCrawler.Core.Helpers;
+using RickAndMortyApiCrawler.Core.Services.Abstractions;
 using RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 
 namespace RickAndMortyApiCrawler.Core.Services;
 public partial class ImportService : IImportService
 {
-    private static SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+    public async Task<bool> CheckForManualRecordAsync(CancellationToken cancellationToken = default)
+    {
+        //var manualRecord = await characterRepository.GetManualRecordAsync(cancellationToken);
+
+        return false;
+    }
 
     public async Task ImportCharacterAsync(CancellationToken cancellationToken = default)
     {
