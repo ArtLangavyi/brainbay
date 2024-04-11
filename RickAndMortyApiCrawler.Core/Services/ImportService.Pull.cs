@@ -22,7 +22,7 @@ public partial class ImportService : IImportService
         await SaveCharactersToDb(charactersList, cancellationToken);
     }
 
-    private async Task SaveCharactersToDb(List<CharacterResponseResult> charactersList, CancellationToken cancellationToken = default)
+    public async Task SaveCharactersToDb(List<CharacterResponseResult> charactersList, CancellationToken cancellationToken = default)
     {
         var charactersDTOs = charactersList.Select(obj => mapper.Map<CharacterDto>(obj)).ToArray();
 
@@ -41,7 +41,7 @@ public partial class ImportService : IImportService
         await LoadAndAddNewLocationsAsync(cancellationToken);
     }
 
-    private async Task<List<CharacterResponseResult>> LoadAndAddNewCharacterAsync(ImportFilter? importFilter, CancellationToken cancellationToken = default)
+    public async Task<List<CharacterResponseResult>> LoadAndAddNewCharacterAsync(ImportFilter? importFilter, CancellationToken cancellationToken = default)
     {
         using var _httpClient = rickAndMortyApiFactory.MakeHttpClient();
         var charactersList = new List<CharacterResponseResult>();

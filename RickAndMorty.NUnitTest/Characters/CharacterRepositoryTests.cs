@@ -1,13 +1,7 @@
-using NUnit.Framework;
-using Moq;
-using System.Threading;
-using System.Threading.Tasks;
-using RickAndMorty.Net.Api.Models.Dto;
-using RickAndMortyApiCrawler.Core.Repositories;
-using RickAndMortyApiCrawler.Data.Context;
-using RickAndMorty.NUnitTest;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
+
+using RickAndMorty.Net.Api.Models.Dto;
+using RickAndMorty.NUnitTest;
 
 namespace RickAndMortyApiCrawler.Core.Tests.Repositories
 {
@@ -28,13 +22,13 @@ namespace RickAndMortyApiCrawler.Core.Tests.Repositories
 
             var charactersDTOs = characterDtoFake.Select(obj => _mapper.Map<CharacterDto>(obj)).ToArray();
 
-            await _characterRepository.AddNewCharactersAsync(charactersDTOs);
+            await _characterRepository.AddNewCharactersAsync(charactersDTOs, CancellationToken.None);
 
             // Act
-            await _characterRepository.RemoveAllCharacterAsync();
+            await _characterRepository.RemoveAllCharacterAsync(CancellationToken.None);
 
             // Assert
-            var characters = await _dbContext.Characters.ToListAsync();
+            var characters = await _dbContext.Characters.ToListAsync(CancellationToken.None);
             Assert.IsEmpty(characters);
         }
 
@@ -51,7 +45,7 @@ namespace RickAndMortyApiCrawler.Core.Tests.Repositories
 
             var charactersDTOs = characterDtoFake.Select(obj => _mapper.Map<CharacterDto>(obj)).ToArray();
 
-            await _characterRepository.AddNewCharactersAsync(charactersDTOs);
+            await _characterRepository.AddNewCharactersAsync(charactersDTOs, CancellationToken.None);
 
             // Act & Assert
             Assert.ThrowsAsync<Exception>(async () =>
@@ -59,7 +53,7 @@ namespace RickAndMortyApiCrawler.Core.Tests.Repositories
                 await _characterRepository.RemoveAllCharacterAsync(CancellationToken.None);
             });
 
-            var characters = await _dbContext.Characters.ToListAsync();
+            var characters = await _dbContext.Characters.ToListAsync(CancellationToken.None);
             Assert.IsNotEmpty(characters);
         }
     }

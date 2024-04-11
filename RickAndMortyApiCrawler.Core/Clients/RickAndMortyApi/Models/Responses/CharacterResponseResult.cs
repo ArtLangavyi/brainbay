@@ -1,5 +1,5 @@
 ﻿namespace RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
-internal class CharacterResponseResult
+public class CharacterResponseResult
 {
     public int id { get; set; }
     public string name { get; set; }
