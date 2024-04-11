@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 
-namespace RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
-
-public class CharacterLocationResponseResult
+internal class CharacterLocationResponseResult
 {
     public int id { get; set; }
     public string name { get; set; }

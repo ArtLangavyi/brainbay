@@ -1,24 +1,7 @@
-﻿using RickAndMorty.Net.Api.Models.Dto;
-
-namespace RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
+﻿namespace RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 internal class CharacterResponse
 {
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public string? Status { get; set; }
-    public string? Species { get; set; }
+    public ResponseInfo info { get; set; }
+    public List<CharacterResponseResult> results { get; set; }
 
-    public string? Type { get; set; }
-
-    /// <summary>
-    /// possible values ('Female', 'Male', 'Genderless' or 'unknown').
-    /// </summary>
-    public string? Gender { get; set; }
-
-    public CharacterLocationResponse? Location { get; set; }
-
-    public string? Image { get; set; }
-    public string[]? Episode { get; set; }
-    public string? Url { get; set; }
-    public string? Created { get; set; }
 }

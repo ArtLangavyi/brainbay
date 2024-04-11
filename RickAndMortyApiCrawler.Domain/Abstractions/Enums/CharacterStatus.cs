@@ -3,6 +3,6 @@ public enum CharacterStatus
 {
     Alive,
     Dead,
-    Unknown
+    unknown
 }
 

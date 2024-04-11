@@ -9,6 +9,7 @@ namespace RickAndMortyApiCrawler.Core.Services;
 public partial class ImportService(IRickAndMortyApiFactory rickAndMortyApiFactory
     , RickAndMortyApiSettings rickAndMortyApiSettings
     , ILocationRepository locationRepository
+    , ICharacterRepository characterRepository
     , IMapper mapper) : IImportService
 {
     const int MaxRetries = 5;

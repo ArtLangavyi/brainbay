@@ -40,6 +40,7 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddTransient<IImportService, ImportService>();
 
         services.AddScoped<ILocationRepository, LocationRepository>();
+        services.AddScoped<ICharacterRepository, CharacterRepository>();
 
     }));
 
@@ -54,7 +55,10 @@ var monitoringTask = Task.Run(MonitorForManualRecordAsync);
 while (true)
 {
     var importService = app.Services.GetRequiredService<IImportService>();
+
     await importService.ImportLocationsAsync(cancellationToken);
+
+    await importService.ImportCharacterAsync(cancellationToken);
 
     if (await stopSemaphore.WaitAsync(TimeSpan.FromMinutes(5)))
     {

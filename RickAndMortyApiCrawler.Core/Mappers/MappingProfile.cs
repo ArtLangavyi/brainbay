@@ -9,7 +9,9 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<CharacterResponse, CharacterDto>();
+        CreateMap<CharacterResponseResult, CharacterDto>()
+            .ForMember(f => f.ExternalId, opt => opt.MapFrom(f => f.id));
+
         CreateMap<CharacterLocationResponseResult, CharacterLocationDto>()
             .ForMember(f => f.LinksToResidents, opt => opt.MapFrom(f => f.residents))
             .ForMember(f => f.ExternalId, opt => opt.MapFrom(f => f.id));

@@ -6,9 +6,9 @@ namespace RickAndMortyApiCrawler.Domain.Models;
 public class Character
 {
     [Key]
-    public required int Id { get; set; }
+    public int Id { get; set; }
     [Column(TypeName = "nvarchar(255)")]
-    public required string Name { get; set; }
+    public string? Name { get; set; }
     public CharacterStatus Status { get; set; }
 
     [Column(TypeName = "nvarchar(255)")]
@@ -26,7 +26,7 @@ public class Character
     public string[]? LinksToEpisode { get; set; }
 
     public string? Url { get; set; }
-    public DateTime Created { get; set; }
-
+    public DateTime? Created { get; set; }
+    public int ExternalId { get; set; }
     public bool IsAddedManual { get; set; }
 }

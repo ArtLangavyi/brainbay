@@ -6,16 +6,16 @@ using RickAndMortyApiCrawler.Core.Mappers;
 using RickAndMortyApiCrawler.Data.Context;
 
 namespace RickAndMortyApiCrawler.Core.Repositories;
-public class LocationRepository(ApiCrawlerDbContext context) : ILocationRepository
+public class CharacterRepository(ApiCrawlerDbContext context) : ICharacterRepository
 {
     private readonly ApiCrawlerDbContext _context = context;
 
-    public async Task RemoveAllLocationsAsync(CancellationToken cancellationToken = default)
+    public async Task RemoveAllCharacterAsync(CancellationToken cancellationToken = default)
     {
         using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         try
         {
-            await _context.Locations.ExecuteDeleteAsync(cancellationToken);
+            await _context.Characters.ExecuteDeleteAsync(cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
         }
@@ -26,18 +26,20 @@ public class LocationRepository(ApiCrawlerDbContext context) : ILocationReposito
         }
     }
 
-    public async Task AddNewLocationsAsync(CharacterLocationDto[] locationDtos, CancellationToken cancellationToken = default)
+    public async Task AddNewCharactersAsync(CharacterDto[] characterDto, CancellationToken cancellationToken = default)
     {
         using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         try
         {
-            var newEntities = locationDtos
-                .Select(obj => obj.MapToLocation())
+            var locations = await _context.Locations.AsNoTracking().ToDictionaryAsync(key => key.Name, value => value.Id, cancellationToken);
+
+            var newEntities = characterDto
+                .Select(obj => obj.MapToCharacter(locations))
                 .ToList();
 
             if (newEntities.Count != 0)
             {
-                _context.Locations.AddRange(newEntities);
+                _context.Characters.AddRange(newEntities);
 
                 await _context.SaveChangesAsync(cancellationToken);
             }
@@ -49,5 +51,10 @@ public class LocationRepository(ApiCrawlerDbContext context) : ILocationReposito
             await transaction.RollbackAsync(cancellationToken);
             throw;
         }
+    }
+
+    public async Task<bool> CheckForManualRecordAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Characters.AnyAsync(e => e.IsAddedManual, cancellationToken);
     }
 }

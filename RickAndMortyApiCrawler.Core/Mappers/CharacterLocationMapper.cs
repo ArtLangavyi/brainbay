@@ -7,17 +7,14 @@ namespace RickAndMortyApiCrawler.Core.Mappers;
 public static class CharacterLocationMapper
 {
 
-    public static Location MapToLocation(this CharacterLocationDto model)
+    public static Location MapToLocation(this CharacterLocationDto model) => new()
     {
-        return new Location()
-        {
-            ExternalId = model.ExternalId,
-            Name = model.Name,
-            Type = model.Type,
-            Dimension = model.Dimension,
-            LinksToResidents = model.LinksToResidents,
-            Url = model.Url,
-            Created = model.Created
-        };
-    }
+        ExternalId = model.ExternalId,
+        Name = model.Name,
+        Type = model.Type,
+        Dimension = model.Dimension,
+        LinksToResidents = model.LinksToResidents,
+        Url = model.Url,
+        Created = model.Created,
+    };
 }

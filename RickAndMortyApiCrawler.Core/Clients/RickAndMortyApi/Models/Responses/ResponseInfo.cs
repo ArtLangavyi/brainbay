@@ -1,5 +1,5 @@
 ﻿namespace RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
-public class ResponseInfo
+internal class ResponseInfo
 {
     public int count { get; set; }
     public int pages { get; set; }

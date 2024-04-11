@@ -6,5 +6,5 @@ public enum CharacterGender
     Female,
     Male,
     Genderless,
-    Unknown
+    unknown
 }

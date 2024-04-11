@@ -30,8 +30,11 @@ namespace RickAndMortyApiCrawler.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Created")
+                    b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("ExternalId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Gender")
                         .HasColumnType("int");
@@ -50,11 +53,7 @@ namespace RickAndMortyApiCrawler.Data.Migrations
                     b.Property<int?>("LocationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("LocationId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -75,8 +74,6 @@ namespace RickAndMortyApiCrawler.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
-
-                    b.HasIndex("LocationId1");
 
                     b.ToTable("Characters", (string)null);
                 });
@@ -124,13 +121,9 @@ namespace RickAndMortyApiCrawler.Data.Migrations
             modelBuilder.Entity("RickAndMortyApiCrawler.Domain.Models.Character", b =>
                 {
                     b.HasOne("RickAndMortyApiCrawler.Domain.Models.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("RickAndMortyApiCrawler.Domain.Models.Location", null)
                         .WithMany("Characters")
-                        .HasForeignKey("LocationId1");
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Location");
                 });

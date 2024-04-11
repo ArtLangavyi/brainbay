@@ -41,10 +41,7 @@ public class ApiCrawlerDbContext(DbContextOptions<ApiCrawlerDbContext> options) 
                   .HasColumnType("nvarchar(max)")
                   .HasColumnName("LinksToResidentsJson");
 
-            entity.HasMany(e => e.Characters)
-                    .WithOne(c => c.Location)
-                    .HasForeignKey(c => c.LocationId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(e => e.Characters);
         });
 
         modelBuilder.Entity<Character>(entity =>
@@ -54,7 +51,6 @@ public class ApiCrawlerDbContext(DbContextOptions<ApiCrawlerDbContext> options) 
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Name)
-                  .IsRequired()
                   .HasMaxLength(255);
 
             entity.Property(e => e.Species)
@@ -63,9 +59,12 @@ public class ApiCrawlerDbContext(DbContextOptions<ApiCrawlerDbContext> options) 
             entity.Property(e => e.Type)
                   .HasMaxLength(255);
 
+            entity.Property(e => e.LocationId);
+
             entity.HasOne(e => e.Location)
-                  .WithMany()
-                  .HasForeignKey(e => e.LocationId);
+                  .WithMany(e => e.Characters)
+                  .HasForeignKey(e => e.LocationId)
+                  .OnDelete(DeleteBehavior.SetNull);
 
             entity.Property(e => e.Image)
                   .HasColumnType("nvarchar(2550)");

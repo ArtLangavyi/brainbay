@@ -1,8 +1,8 @@
 ﻿namespace RickAndMorty.Net.Api.Models.Dto;
 public class CharacterDto
 {
-    public int Id { get; set; }
-    public required string Name { get; set; }
+    public int ExternalId { get; set; }
+    public string Name { get; set; }
     public string? Status { get; set; }
     public string? Species { get; set; }
 
