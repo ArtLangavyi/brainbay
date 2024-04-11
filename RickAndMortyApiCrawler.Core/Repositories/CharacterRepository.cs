@@ -15,7 +15,10 @@ public class CharacterRepository(ApiCrawlerDbContext context) : ICharacterReposi
         using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         try
         {
-            await _context.Characters.ExecuteDeleteAsync(cancellationToken);
+            var entities = await _context.Characters.ToListAsync(cancellationToken);
+            _context.Characters.RemoveRange(entities);
+            await _context.SaveChangesAsync(cancellationToken);
+            //await _context.Characters.ExecuteDeleteAsync(cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
         }
