@@ -2,6 +2,7 @@
 
 using RickAndMorty.Net.Api.Models.Dto;
 
+using RickAndMortyApiCrawler.Core.Mappers;
 using RickAndMortyApiCrawler.Data.Context;
 
 namespace RickAndMortyApiCrawler.Core.Repositories;
@@ -11,37 +12,47 @@ public class LocationRepository : ILocationRepository
 
     public LocationRepository(ApiCrawlerDbContext context) => _context = context;
 
-    public async Task UpdateLocationsListAsync(CharacterLocationDto[] locationDtos)
+    public async Task RemoveAllLocationsAsync(CancellationToken cancellationToken = default)
     {
-        await RemoveNotExistingLocationsAsync(locationDtos);
+        using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+        try
+        {
+            await _context.Locations.ExecuteDeleteAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
-    private async Task RemoveNotExistingLocationsAsync(IEnumerable<CharacterLocationDto> locationDtos)
+    public async Task AddNewLocationsAsync(CharacterLocationDto[] locationDtos, CancellationToken cancellationToken = default)
     {
-        using (var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted))
+        using var transaction = _context.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+        try
         {
-            try
+            var idsList = await _context.Locations.AsNoTracking().Select(obj => obj.ExternalId).ToListAsync(cancellationToken);
+
+            var newEntities = locationDtos
+                .Where(obj => !idsList.Contains(obj.ExternalId))
+                .Select(obj => obj.MapToLocation())
+                .ToList();
+
+            if (newEntities.Count != 0)
             {
-                var namesInList = locationDtos.Select(obj => obj.Name).ToList();
+                _context.Locations.AddRange(newEntities);
 
-                var entitiesToRemove = await _context.Locations
-                    .Where(entity => !namesInList.Contains(entity.Name))
-                    .ToListAsync();
-
-                if(entitiesToRemove.Count != 0)
-                {
-                    _context.Locations.RemoveRange(entitiesToRemove);
-
-                    await _context.SaveChangesAsync();
-                }
-
-                await transaction.CommitAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
         }
     }
 }

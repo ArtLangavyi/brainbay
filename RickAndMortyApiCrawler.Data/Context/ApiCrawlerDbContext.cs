@@ -31,7 +31,7 @@ public class ApiCrawlerDbContext(DbContextOptions<ApiCrawlerDbContext> options) 
 
             entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
 
-            entity.Property(e => e.Type).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Type).HasMaxLength(255);
 
             entity.Property(e => e.Dimension).HasMaxLength(255);
 
@@ -41,6 +41,7 @@ public class ApiCrawlerDbContext(DbContextOptions<ApiCrawlerDbContext> options) 
 
             entity.Property(e => e.Url);
             entity.Property(e => e.Created);
+            entity.Property(e => e.ExternalId); 
             entity.HasMany(e => e.Characters);
         });
 

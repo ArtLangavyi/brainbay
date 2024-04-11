@@ -2,34 +2,61 @@
 
 using RickAndMortyApiCrawler.Core.Services.Abstractions;
 using RickAndMortyApiCrawler.Core.Helpers;
+using RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 
 namespace RickAndMortyApiCrawler.Core.Services;
 public partial class ImportService : IImportService
 {
-    public async Task PullLocationsAsync(CancellationToken cancellationToken = default)
+    private static SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+
+    public async Task ImportCharacterAsync(CancellationToken cancellationToken = default)
+    {
+    }
+
+    public async Task ImportLocationsAsync(CancellationToken cancellationToken = default)
+    {
+        await locationRepository.RemoveAllLocationsAsync(cancellationToken);
+
+        await LoadAndAddNewLocationsAsync(cancellationToken);
+    }
+
+    public async Task LoadAndAddNewLocationsAsync(CancellationToken cancellationToken = default)
     {
         using var _httpClient = rickAndMortyApiFactory.MakeHttpClient();
-        var locations = await SendAsync(_httpClient, rickAndMortyApiSettings.LocationsEndpoint, cancellationToken);
-
-        if (locations is not null)
+        var url = rickAndMortyApiSettings.LocationsEndpoint;
+        while (!string.IsNullOrEmpty(url))
         {
-            var locationsResponse = await ConversionHelper.ConvertResponseToObjectAsync<CharacterLocationResponse[]>(locations);
-
-            if (locationsResponse is not null)
+            var locations = await SendAsync(_httpClient, url.Replace(rickAndMortyApiSettings.BaseUrl, ""), cancellationToken);
+            if (locations is not null)
             {
-                var locationDtos = locationsResponse.Select(obj => mapper.Map<CharacterLocationDto>(obj)).ToArray();
+                var locationsResponse = await ConversionHelper.ConvertResponseToObjectAsync<CharacterLocationResponse>(locations);
 
-                await locationRepository.UpdateLocationsListAsync(locationDtos);
+                if (locationsResponse is not null)
+                {
+                    var locationDtos = locationsResponse.results.Select(obj => mapper.Map<CharacterLocationDto>(obj)).ToArray();
+
+                    await locationRepository.AddNewLocationsAsync(locationDtos, cancellationToken);
+
+                    url = locationsResponse.info.next;
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+            else
+            {
+                break;
             }
         }
     }
 
     private async Task<HttpResponseMessage?> SendAsync(HttpClient _httpClient, string url, CancellationToken cancellationToken)
     {
-        HttpResponseMessage? response = default;
         for (int i = 0; i < MaxRetries; i++)
         {
-            response = await _httpClient.GetAsync(url, cancellationToken);
+            HttpResponseMessage? response = await _httpClient.GetAsync(url, cancellationToken);
 
             if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
             {
@@ -49,6 +76,6 @@ public partial class ImportService : IImportService
             }
         }
 
-        return response;
+        return default;
     }
 }

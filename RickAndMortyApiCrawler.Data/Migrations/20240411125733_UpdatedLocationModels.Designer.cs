@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RickAndMortyApiCrawler.Data.Context;
 
@@ -11,9 +12,11 @@ using RickAndMortyApiCrawler.Data.Context;
 namespace RickAndMortyApiCrawler.Data.Migrations
 {
     [DbContext(typeof(ApiCrawlerDbContext))]
-    partial class ApiCrawlerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240411125733_UpdatedLocationModels")]
+    partial class UpdatedLocationModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

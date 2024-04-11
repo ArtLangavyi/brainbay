@@ -8,12 +8,17 @@ using RickAndMortyApiCrawler.Core.Clients;
 using RickAndMortyApiCrawler.Core.Infrastructure;
 using RickAndMortyApiCrawler.Core.Mappers;
 using RickAndMortyApiCrawler.Core.Repositories;
+using RickAndMortyApiCrawler.Core.Services;
+using RickAndMortyApiCrawler.Core.Services.Abstractions;
 using RickAndMortyApiCrawler.Data.Context;
 
 using System.Net;
+using System.Threading;
 
 
 Console.WriteLine("Hello, World!");
+
+var stopSemaphore = new SemaphoreSlim(0, 1);
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices((Action<HostBuilderContext, IServiceCollection>)((hostContext, services) =>
@@ -27,10 +32,12 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
         var rickAndMortyApiSettings = hostContext.Configuration.GetSection("RickAndMortyApiSettings").Get<RickAndMortyApiSettings>();
-        ConfigureHttpClientForRickAndMoprtyApi(services, rickAndMortyApiSettings);
+        ConfigureHttpClientForRickAndMortyApi(services, rickAndMortyApiSettings);
 
         services.AddSingleton(rickAndMortyApiSettings!);
+
         services.AddTransient<IRickAndMortyApiFactory, RickAndMortyApiFactory>();
+        services.AddTransient<IImportService, ImportService>();
 
         services.AddScoped<ILocationRepository, LocationRepository>();
 
@@ -40,7 +47,48 @@ var app = builder.Build();
 
 app.EnsureDatabaseUpdated();
 
-static void ConfigureHttpClientForRickAndMoprtyApi(IServiceCollection services, RickAndMortyApiSettings? rickAndMortyApiSettings)
+var cancellationToken = new CancellationToken();
+
+var monitoringTask = Task.Run(MonitorForManualRecordAsync);
+
+while (true)
+{
+    var importService = app.Services.GetRequiredService<IImportService>();
+    await importService.ImportLocationsAsync(cancellationToken);
+
+    if (await stopSemaphore.WaitAsync(TimeSpan.FromMinutes(5)))
+    {
+        Console.WriteLine("Manual record detected or operation stopped. Exiting loop.");
+        break;
+    }
+}
+
+
+await monitoringTask;
+
+
+async Task MonitorForManualRecordAsync()
+{
+    while (true)
+    {
+        if (await CheckForManualRecordAsync())
+        {
+            stopSemaphore.Release();
+            break;
+        }
+
+        // Check every minute for a manual record
+        await Task.Delay(TimeSpan.FromMinutes(1));
+    }
+}
+
+async Task<bool> CheckForManualRecordAsync()
+{
+    return false;
+}
+
+
+static void ConfigureHttpClientForRickAndMortyApi(IServiceCollection services, RickAndMortyApiSettings? rickAndMortyApiSettings)
 {
     var socketsHttpHandler = new SocketsHttpHandler()
     {
@@ -71,3 +119,4 @@ static void ConfigureHttpClientForRickAndMoprtyApi(IServiceCollection services, 
         }).ConfigurePrimaryHttpMessageHandler(() => socketsHttpHandler);
     }
 }
+

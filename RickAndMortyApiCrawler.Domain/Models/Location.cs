@@ -1,11 +1,15 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace RickAndMortyApiCrawler.Domain.Models;
-public class Location : BaseEntity
+public class Location 
 {
+    [Key]
+    public int Id { get; set; }
+    public int ExternalId { get; set; }
     [Column(TypeName = "nvarchar(255)")]
-    public required string Name { get; set; }
+    public string Name { get; set; }
     [Column(TypeName = "nvarchar(255)")]
-    public required string Type { get; set; }
+    public string Type { get; set; }
     [Column(TypeName = "nvarchar(255)")]
     public string? Dimension { get; set; }
 
