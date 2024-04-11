@@ -4,6 +4,8 @@ using RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 using RickAndMortyApiCrawler.Core.Helpers;
 using RickAndMortyApiCrawler.Core.Services.Abstractions;
 
+using System.Threading;
+
 namespace RickAndMortyApiCrawler.Core.Services;
 public partial class ImportService : IImportService
 {
@@ -14,9 +16,21 @@ public partial class ImportService : IImportService
 
     public async Task ImportCharacterAsync(CancellationToken cancellationToken = default)
     {
-        await characterRepository.RemoveAllCharacterAsync(cancellationToken);
+        var charactersList = await LoadAndAddNewCharacterAsync(cancellationToken);
+        
+        await SaveCharactersToDb(charactersList, cancellationToken);
+    }
 
-        await LoadAndAddNewCharacterAsync(cancellationToken);
+    private async Task SaveCharactersToDb(List<CharacterResponseResult> charactersList, CancellationToken cancellationToken = default)
+    {
+        var charactersDTOs = charactersList.Select(obj => mapper.Map<CharacterDto>(obj)).ToArray();
+
+        if (!await CheckForManualRecordAsync(cancellationToken))
+        {
+            await characterRepository.RemoveAllCharacterAsync(cancellationToken);
+
+            await characterRepository.AddNewCharactersAsync(charactersDTOs, cancellationToken);
+        }
     }
 
     public async Task ImportLocationsAsync(CancellationToken cancellationToken = default)
@@ -26,10 +40,12 @@ public partial class ImportService : IImportService
         await LoadAndAddNewLocationsAsync(cancellationToken);
     }
 
-    private async Task LoadAndAddNewCharacterAsync(CancellationToken cancellationToken = default)
+    private async Task<List<CharacterResponseResult>> LoadAndAddNewCharacterAsync(CancellationToken cancellationToken = default)
     {
         using var _httpClient = rickAndMortyApiFactory.MakeHttpClient();
         var url = rickAndMortyApiSettings.CharactersEndpoint;
+        var charactersList = new List<CharacterResponseResult>();
+
         while (!string.IsNullOrEmpty(url))
         {
             var characters = await SendAsync(_httpClient, url.Replace(rickAndMortyApiSettings.BaseUrl, ""), cancellationToken);
@@ -39,9 +55,7 @@ public partial class ImportService : IImportService
 
                 if (charactersResponse is not null)
                 {
-                    var charactersDtos = charactersResponse.results.Select(obj => mapper.Map<CharacterDto>(obj)).ToArray();
-
-                    await characterRepository.AddNewCharactersAsync(charactersDtos, cancellationToken);
+                    charactersList.AddRange(charactersResponse.results);
 
                     url = charactersResponse.info.next;
                 }
@@ -56,6 +70,8 @@ public partial class ImportService : IImportService
                 break;
             }
         }
+
+        return charactersList;
     }
 
     private async Task LoadAndAddNewLocationsAsync(CancellationToken cancellationToken = default)

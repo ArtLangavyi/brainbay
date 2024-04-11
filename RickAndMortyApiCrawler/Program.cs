@@ -18,13 +18,12 @@ using System.Net;
 Console.WriteLine("Hello, World!");
 
 var stopSemaphore = new SemaphoreSlim(0, 1);
-IServiceProvider serviceProvider = null;
+IServiceProvider? serviceProvider = null;
 var timeoutForStopLoadDataInMinutes = 5;
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices((Action<HostBuilderContext, IServiceCollection>)((hostContext, services) =>
     {
-
         services.AddDbContext<ApiCrawlerDbContext>(db => db.UseSqlServer(hostContext.Configuration.GetConnectionString("DefaultConnection"), b =>
         {
             b.MigrationsAssembly("RickAndMortyApiCrawler.Data");
@@ -54,28 +53,27 @@ var app = builder.Build();
 
 app.EnsureDatabaseUpdated();
 
+if (serviceProvider == null)
+{
+    throw new InvalidOperationException("ServiceProvider is null. Exiting the process.");
+}
+
 var cancellationToken = new CancellationToken();
 
 var monitorForManualRecordTask = Task.Run(MonitorForManualRecordAsync);
 
 while (true)
 {
-    if (serviceProvider != null)
+    var importService = app.Services.GetRequiredService<IImportService>();
+    await importService.ImportLocationsAsync(cancellationToken);
+    await importService.ImportCharacterAsync(cancellationToken);
+
+    if (await stopSemaphore.WaitAsync(TimeSpan.FromMinutes(timeoutForStopLoadDataInMinutes)))
     {
-        var importService = app.Services.GetRequiredService<IImportService>();
-
-        await importService.ImportLocationsAsync(cancellationToken);
-
-        await importService.ImportCharacterAsync(cancellationToken);
-
-        if (await stopSemaphore.WaitAsync(TimeSpan.FromMinutes(timeoutForStopLoadDataInMinutes)))
-        {
-            Console.WriteLine("Manual record detected or operation stopped. Exiting loop.");
-            break;
-        }
+        Console.WriteLine("Manual record detected or operation stopped. Exiting loop.");
+        break;
     }
 }
-
 
 await monitorForManualRecordTask;
 
@@ -97,17 +95,10 @@ async Task MonitorForManualRecordAsync()
 
 async Task<bool> CheckForManualRecordAsync()
 {
-    if (serviceProvider != null)
-    {
-        using (var scope = serviceProvider.CreateScope())
-        {
-            var importService = scope.ServiceProvider.GetRequiredService<IImportService>();
-            return await importService.CheckForManualRecordAsync(cancellationToken);
-        }
-    }
-    return false;
+    using var scope = serviceProvider.CreateScope();
+    var importService = scope.ServiceProvider.GetRequiredService<IImportService>();
+    return await importService.CheckForManualRecordAsync(cancellationToken);
 }
-
 
 static void ConfigureHttpClientForRickAndMortyApi(IServiceCollection services, RickAndMortyApiSettings? rickAndMortyApiSettings)
 {
@@ -140,4 +131,3 @@ static void ConfigureHttpClientForRickAndMortyApi(IServiceCollection services, R
         }).ConfigurePrimaryHttpMessageHandler(() => socketsHttpHandler);
     }
 }
-
