@@ -18,6 +18,8 @@ using System.Net;
 Console.WriteLine("Hello, World!");
 
 var stopSemaphore = new SemaphoreSlim(0, 1);
+IServiceProvider serviceProvider = null;
+var timeoutForStopLoadDataInMinutes = 5;
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices((Action<HostBuilderContext, IServiceCollection>)((hostContext, services) =>
@@ -31,7 +33,9 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
         var rickAndMortyApiSettings = hostContext.Configuration.GetSection("RickAndMortyApiSettings").Get<RickAndMortyApiSettings>();
-        var AppSettings = hostContext.Configuration.GetSection("AppSettings").Get<AppSettings>();
+
+        timeoutForStopLoadDataInMinutes = hostContext.Configuration.GetValue<int>("AppSettings:TimeoutForStopLoadDataInMinutes");
+
         ConfigureHttpClientForRickAndMortyApi(services, rickAndMortyApiSettings);
 
         services.AddSingleton(rickAndMortyApiSettings!);
@@ -42,6 +46,8 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddScoped<ILocationRepository, LocationRepository>();
         services.AddScoped<ICharacterRepository, CharacterRepository>();
 
+        serviceProvider = services.BuildServiceProvider();
+
     }));
 
 var app = builder.Build();
@@ -50,25 +56,28 @@ app.EnsureDatabaseUpdated();
 
 var cancellationToken = new CancellationToken();
 
-var monitoringTask = Task.Run(MonitorForManualRecordAsync);
+var monitorForManualRecordTask = Task.Run(MonitorForManualRecordAsync);
 
 while (true)
 {
-    var importService = app.Services.GetRequiredService<IImportService>();
-
-    await importService.ImportLocationsAsync(cancellationToken);
-
-    await importService.ImportCharacterAsync(cancellationToken);
-
-    if (await stopSemaphore.WaitAsync(TimeSpan.FromMinutes(5)))
+    if (serviceProvider != null)
     {
-        Console.WriteLine("Manual record detected or operation stopped. Exiting loop.");
-        break;
+        var importService = app.Services.GetRequiredService<IImportService>();
+
+        await importService.ImportLocationsAsync(cancellationToken);
+
+        await importService.ImportCharacterAsync(cancellationToken);
+
+        if (await stopSemaphore.WaitAsync(TimeSpan.FromMinutes(timeoutForStopLoadDataInMinutes)))
+        {
+            Console.WriteLine("Manual record detected or operation stopped. Exiting loop.");
+            break;
+        }
     }
 }
 
 
-await monitoringTask;
+await monitorForManualRecordTask;
 
 
 async Task MonitorForManualRecordAsync()
@@ -88,8 +97,15 @@ async Task MonitorForManualRecordAsync()
 
 async Task<bool> CheckForManualRecordAsync()
 {
-    var importService = app.Services.GetRequiredService<IImportService>();
-    return await importService.CheckForManualRecordAsync(cancellationToken);
+    if (serviceProvider != null)
+    {
+        using (var scope = serviceProvider.CreateScope())
+        {
+            var importService = scope.ServiceProvider.GetRequiredService<IImportService>();
+            return await importService.CheckForManualRecordAsync(cancellationToken);
+        }
+    }
+    return false;
 }
 
 

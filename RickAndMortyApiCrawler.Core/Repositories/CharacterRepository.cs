@@ -55,6 +55,6 @@ public class CharacterRepository(ApiCrawlerDbContext context) : ICharacterReposi
 
     public async Task<bool> CheckForManualRecordAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Characters.AnyAsync(e => e.IsAddedManual, cancellationToken);
+        return await _context.Characters.AsNoTracking().AnyAsync(e => e.IsAddedManual, cancellationToken);
     }
 }
