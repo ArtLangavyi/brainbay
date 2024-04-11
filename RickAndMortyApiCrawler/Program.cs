@@ -7,6 +7,8 @@ using RickAndMortyApiCrawler;
 using RickAndMortyApiCrawler.Core.Clients;
 using RickAndMortyApiCrawler.Core.Infrastructure;
 using RickAndMortyApiCrawler.Core.Mappers;
+using RickAndMortyApiCrawler.Core.Models.ImportCharacter;
+using RickAndMortyApiCrawler.Core.Models.ImportCharacter.Enums;
 using RickAndMortyApiCrawler.Core.Repositories;
 using RickAndMortyApiCrawler.Core.Services;
 using RickAndMortyApiCrawler.Core.Services.Abstractions;
@@ -62,11 +64,16 @@ var cancellationToken = new CancellationToken();
 
 var monitorForManualRecordTask = Task.Run(MonitorForManualRecordAsync);
 
+ImportFilter importFilter = new()
+{
+    Status = ImportFilterStatusEnum.Alive
+};
+
 while (true)
 {
     var importService = app.Services.GetRequiredService<IImportService>();
     await importService.ImportLocationsAsync(cancellationToken);
-    await importService.ImportCharacterAsync(cancellationToken);
+    await importService.ImportCharacterAsync(importFilter, cancellationToken);
 
     if (await stopSemaphore.WaitAsync(TimeSpan.FromMinutes(timeoutForStopLoadDataInMinutes)))
     {
