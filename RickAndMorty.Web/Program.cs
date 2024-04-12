@@ -22,7 +22,7 @@ builder.Services.AddHttpClient(RickAndMortyWebApiFactory.ClientName, o =>
     o.BaseAddress = new Uri(rickAndMortyWebApiSettings.BaseUrl);
 }).ConfigurePrimaryHttpMessageHandler(() => socketsHttpHandler);
 
-builder.Services.AddSingleton(rickAndMortyWebApiSettings!);
+builder.Services.Configure<RickAndMortyWebApiSettings>(builder.Configuration.GetSection("RickAndMortyWebApiSettings"));
 
 builder.Services.AddTransient<IRickAndMortyWebApiFactory, RickAndMortyWebApiFactory>();
 builder.Services.AddTransient<ILocationService, LocationService>();
