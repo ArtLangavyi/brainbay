@@ -32,6 +32,8 @@ public class CharacterRepository(RickAndMortyContext context) : ICharacterReposi
     {
         var entity = request.MapToCharacter();
 
+        entity.IsAddedManual = true;
+
         await _context.Characters.AddAsync(entity, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
