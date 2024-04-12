@@ -1,4 +1,5 @@
 using RickAndMorty.Web.Core.Clients;
+using RickAndMorty.Web.Core.Services;
 using RickAndMorty.Web.Models.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,13 +14,19 @@ var socketsHttpHandler = new SocketsHttpHandler()
     EnableMultipleHttp2Connections = true
 };
 
-var RickAndMortyWebApiSettings = builder.Configuration.GetSection("RickAndMortyWebApiSettings").Get<RickAndMortyWebApiSettings>();
+var rickAndMortyWebApiSettings = builder.Configuration.GetSection("RickAndMortyWebApiSettings").Get<RickAndMortyWebApiSettings>();
 
 builder.Services.AddHttpClient(RickAndMortyWebApiFactory.ClientName, o =>
 {
-    o.Timeout = TimeSpan.FromSeconds(RickAndMortyWebApiSettings.HttpClientTimeoutSeconds);
-    o.BaseAddress = new Uri(RickAndMortyWebApiSettings.BaseUrl);
+    o.Timeout = TimeSpan.FromSeconds(rickAndMortyWebApiSettings!.HttpClientTimeoutSeconds);
+    o.BaseAddress = new Uri(rickAndMortyWebApiSettings.BaseUrl);
 }).ConfigurePrimaryHttpMessageHandler(() => socketsHttpHandler);
+
+builder.Services.AddSingleton(rickAndMortyWebApiSettings!);
+
+builder.Services.AddTransient<IRickAndMortyWebApiFactory, RickAndMortyWebApiFactory>();
+builder.Services.AddTransient<ILocationService, LocationService>();
+builder.Services.AddTransient<ICharacterService, CharacterService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
