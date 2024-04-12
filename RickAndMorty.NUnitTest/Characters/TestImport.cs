@@ -24,6 +24,6 @@ public class TestImport : BaseTest
         var importedCharacters = await _dbContext.Characters.AsNoTracking().ToListAsync();
 
         // Assert
-        Assert.That(importedCharacters.Count, Is.EqualTo(charactersList.Count), "The number of characters returned does not match the expected count.");
+        Assert.That(importedCharacters, Has.Count.EqualTo(charactersList.Count), "The number of characters returned does not match the expected count.");
     }
 }
