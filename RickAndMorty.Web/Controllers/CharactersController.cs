@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using RickAndMorty.Web.Attributes;
 using RickAndMorty.Web.Core.Services;
-using RickAndMorty.Web.Models;
 using RickAndMorty.Web.Mappers;
+using RickAndMorty.Web.Models;
 
 using System.Diagnostics;
 
@@ -33,11 +33,11 @@ namespace RickAndMorty.Web.Controllers
 
             var characters = await _characterService.GetAllCharactersAsync(planet);
 
-            if(characters is null)
+            if (characters is null)
             {
                 return View(viewModel);
             }
-            
+
             viewModel = characters.Select(e => e.MapCharacterToViewModel());
 
             return View(viewModel);

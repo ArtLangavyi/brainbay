@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Extensions.Options;
+
 using RickAndMorty.Web.Core.Clients;
 using RickAndMorty.Web.Core.Settings;
 

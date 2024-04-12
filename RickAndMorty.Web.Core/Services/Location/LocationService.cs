@@ -7,7 +7,7 @@ using RickAndMorty.Web.Core.Settings;
 using RickAndMorty.Web.Models;
 
 namespace RickAndMorty.Web.Core.Services;
-public partial class LocationService: ILocationService
+public partial class LocationService : ILocationService
 {
     private readonly IRickAndMortyWebApiFactory _rickAndMortyWebApiFactory;
     private readonly RickAndMortyWebApiSettings _rickAndMortyWebApiSettings;
