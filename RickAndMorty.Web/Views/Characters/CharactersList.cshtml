@@ -29,24 +29,28 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
                     @Html.DisplayFor(modelItem => item.id)
-            </td>
-            <td>
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.name)
-            </td>
-            <td>
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.status)
-            </td>
-            <td>
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.planet)
-            </td>
-            <td>
-                    <a href="/characters?planet=@item.planet">View only planet @item.planet</a>
-            </td>
-        </tr>
-}
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.planet))
+                    {
+                        <a href="/characters?planet=@item.planet">View only planet @item.planet</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
