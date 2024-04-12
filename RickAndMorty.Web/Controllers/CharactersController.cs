@@ -64,7 +64,7 @@ namespace RickAndMorty.Web.Controllers
                 ModelState.AddModelError("Name", "Huston, we have a problem!");
             }
 
-            return View(model);
+            return View("CharacterCreated", newCharacterId);
         }
     }
 }

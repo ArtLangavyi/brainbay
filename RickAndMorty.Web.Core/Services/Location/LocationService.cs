@@ -19,7 +19,7 @@ public partial class LocationService : ILocationService
     public async Task<LocationResponse[]> GetAllPlanetsAsync(CancellationToken cancellationToken = default)
     {
         using var _httpClient = _rickAndMortyWebApiFactory.MakeHttpClient();
-        var planetsResponse = await _rickAndMortyWebApiFactory.SendAsync(_httpClient, _rickAndMortyWebApiSettings.GetPlanetsEndpoint, cancellationToken);
+        var planetsResponse = await _rickAndMortyWebApiFactory.SendAsync(_httpClient, _rickAndMortyWebApiSettings.GetPlanetsEndpoint, HttpMethod.Get, null, cancellationToken);
 
         if (planetsResponse is not null)
         {

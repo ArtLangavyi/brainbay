@@ -1,0 +1,18 @@
+﻿@model int
+
+@{
+    ViewData["Title"] = "Character Created";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Congratulations! You created new Character with id @Model </h1>
+
+<hr />
+
+<div>
+    <a asp-action="CharactersList">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

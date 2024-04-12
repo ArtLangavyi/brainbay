@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 
+using System.Net;
+using System.Net.Http;
+
 namespace RickAndMorty.Web.Core.Clients;
 public abstract class ApiFactoryBase(string clientName, IHttpClientFactory clientFactory, IConfiguration config) : IApiFactoryBase
 {
@@ -12,13 +15,22 @@ public abstract class ApiFactoryBase(string clientName, IHttpClientFactory clien
         return _clientFactory.CreateClient(clientName ?? _clientName);
     }
 
-    public async Task<HttpResponseMessage?> SendAsync(HttpClient _httpClient, string url, CancellationToken cancellationToken)
+    public async Task<HttpResponseMessage?> SendAsync(HttpClient httpClient, string url, HttpMethod method, HttpContent? content = null, CancellationToken cancellationToken = default)
     {
         for (int i = 0; i < 5; i++)
         {
-            HttpResponseMessage? response = await _httpClient.GetAsync(url, cancellationToken);
+            HttpResponseMessage? response = null;
 
-            if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            if (method == HttpMethod.Get)
+            {
+                response = await httpClient.GetAsync(url, cancellationToken);
+            }
+            else if (method == HttpMethod.Post && content != null)
+            {
+                response = await httpClient.PostAsync(url, content, cancellationToken);
+            }
+
+            if (response?.StatusCode == HttpStatusCode.TooManyRequests)
             {
                 var sleepTimer = 10;
 
@@ -27,7 +39,7 @@ public abstract class ApiFactoryBase(string clientName, IHttpClientFactory clien
 
                 Thread.Sleep(sleepTimer * 1000);
 
-                await SendAsync(_httpClient, url, cancellationToken);
+                await SendAsync(httpClient, url, method, content, cancellationToken);
             }
 
             if (response.IsSuccessStatusCode)

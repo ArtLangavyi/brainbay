@@ -12,7 +12,7 @@ public partial class CharacterService
 
         var url = BuildUrl(planet);
 
-        var charactersResponse = await _rickAndMortyWebApiFactory.SendAsync(_httpClient, url, cancellationToken);
+        var charactersResponse = await _rickAndMortyWebApiFactory.SendAsync(_httpClient, url, HttpMethod.Get, null, cancellationToken);
 
         if (charactersResponse is not null)
         {
