@@ -1,6 +1,6 @@
 ﻿
 namespace RickAndMorty.Web.Models;
-public class AddCharactersRequest
+public class AddCharacterRequest
 {
     public required string Name { get; set; }
 }

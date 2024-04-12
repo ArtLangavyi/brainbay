@@ -5,11 +5,8 @@ using RickAndMorty.Web.Core.Services;
 using RickAndMorty.Web.Mappers;
 using RickAndMorty.Web.Models;
 
-using System.Diagnostics;
-
 namespace RickAndMorty.Web.Controllers
 {
-    [AddHeader("from-database", "true")]
     public class CharactersController : Controller
     {
         private readonly ILogger<CharactersController> _logger;
@@ -25,7 +22,6 @@ namespace RickAndMorty.Web.Controllers
         }
 
         [HttpGet]
-        [Route("characters/{planet?}")]
         [AddHeader("from-database", "true")]
         public async Task<IActionResult> CharactersListAsync(string? planet = default)
         {
@@ -43,15 +39,32 @@ namespace RickAndMorty.Web.Controllers
             return View(viewModel);
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public IActionResult AddCharacterAsync()
         {
-            return View();
+            var viewModel = new AddCharacterViewModel();
+
+            return View(viewModel);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpPost]
+        public async Task<IActionResult> AddCharacterAsync(AddCharacterViewModel model)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var request = model.MapAddCharacterViewModelToAddCharacterRequest();
+
+            var newCharacterId = await _characterService.AddCharacterAsync(request);
+
+            if (newCharacterId == 0)
+            {
+                ModelState.AddModelError("Name", "Huston, we have a problem!");
+            }
+
+            return View(model);
         }
     }
 }

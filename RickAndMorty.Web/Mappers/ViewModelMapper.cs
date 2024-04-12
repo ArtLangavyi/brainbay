@@ -7,4 +7,12 @@ public static class ViewModelMapper
     {
         return new CharacterViewModel(character.id, character.name, character.status, character.planet);
     }
+
+    public static AddCharacterRequest MapAddCharacterViewModelToAddCharacterRequest(this AddCharacterViewModel character)
+    {
+        return new AddCharacterRequest
+        {
+            Name = character.Name,
+        };
+    }
 }
