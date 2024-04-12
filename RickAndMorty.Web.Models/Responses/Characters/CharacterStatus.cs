@@ -1,4 +1,4 @@
-﻿namespace RickAndMorty.WebApi.Models.Responses.Characters;
+﻿namespace RickAndMorty.Web.Models;
 public enum CharacterStatus
 {
     Alive,

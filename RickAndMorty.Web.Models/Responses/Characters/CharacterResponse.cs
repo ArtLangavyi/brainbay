@@ -1,4 +1,5 @@
-﻿namespace RickAndMorty.WebApi.Models.Responses.Characters;
+﻿
+namespace RickAndMorty.Web.Models;
 public class CharacterResponse
 {
     public int Id { get; set; }

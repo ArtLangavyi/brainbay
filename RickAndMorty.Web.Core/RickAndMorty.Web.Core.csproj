@@ -7,15 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
-    <PackageReference Include="Elastic.Apm.SerilogEnricher" Version="1.5.3" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-    <PackageReference Include="Serilog" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RickAndMorty.Shared\RickAndMorty.Shared.csproj" />
-    <ProjectReference Include="..\RickAndMortyApiCrawler.Data\RickAndMortyApiCrawler.Data.csproj" />
+    <ProjectReference Include="..\RickAndMorty.Web.Models\RickAndMorty.Web.Models.csproj" />
+    <ProjectReference Include="..\RickAndMorty.WebApi.Models\RickAndMorty.WebApi.Models.csproj" />
   </ItemGroup>
 
 </Project>

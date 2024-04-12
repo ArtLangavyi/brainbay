@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RickAndMortyApiCrawler.Data\RickAndMortyApiCrawler.Data.csproj" />
+    <ProjectReference Include="..\RickAndMorty.Web.Core\RickAndMorty.Web.Core.csproj" />
+    <ProjectReference Include="..\RickAndMorty.Web.Models\RickAndMorty.Web.Models.csproj" />
   </ItemGroup>
 
 </Project>

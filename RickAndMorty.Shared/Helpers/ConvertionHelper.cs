@@ -1,4 +1,4 @@
-﻿namespace RickAndMortyApiCrawler.Core.Helpers;
+﻿namespace RickAndMorty.Shared;
 
 public class ConversionHelper
 {

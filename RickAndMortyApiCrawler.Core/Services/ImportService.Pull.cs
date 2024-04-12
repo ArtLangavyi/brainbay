@@ -1,9 +1,10 @@
 ﻿using RickAndMorty.Net.Api.Models.Dto;
 
 using RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
-using RickAndMortyApiCrawler.Core.Helpers;
 using RickAndMortyApiCrawler.Core.Models.ImportCharacter;
 using RickAndMortyApiCrawler.Core.Services.Abstractions;
+
+using RickAndMorty.Shared;
 
 using System.Web;
 

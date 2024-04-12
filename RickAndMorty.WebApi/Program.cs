@@ -24,7 +24,7 @@ builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
 
 builder.Services.AddTransient<ICharacterService, CharacterService>();
-builder.Services.AddTransient<ILocationService, LocationService>(); 
+builder.Services.AddTransient<ILocationService, LocationService>();
 
 var app = builder.Build();
 

@@ -1,6 +1,4 @@
-﻿using RickAndMorty.WebApi.Core.Mappers;
-using RickAndMorty.WebApi.Models.Requests.Characters;
-using RickAndMorty.WebApi.Models.Responses.Characters;
+﻿using RickAndMorty.WebApi.Models.Requests.Characters;
 
 namespace RickAndMorty.WebApi.Core.Services.Character;
 public partial class CharacterService
