@@ -17,4 +17,8 @@
     <ProjectReference Include="..\RickAndMorty.Web.Models\RickAndMorty.Web.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Settings\" />
+  </ItemGroup>
+
 </Project>

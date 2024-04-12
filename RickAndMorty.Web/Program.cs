@@ -1,7 +1,6 @@
 using RickAndMorty.Web.Core.Clients;
 using RickAndMorty.Web.Core.Services;
-using RickAndMorty.Web.Models.Settings;
-
+using RickAndMorty.Web.Core.Settings;
 var builder = WebApplication.CreateBuilder(args);
 
 var socketsHttpHandler = new SocketsHttpHandler()

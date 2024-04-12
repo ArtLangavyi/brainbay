@@ -2,15 +2,12 @@
 namespace RickAndMorty.Web.Models;
 public class LocationResponse
 {
-    public int ExternalId { get; set; }
-    public string Name { get; set; }
-    public string Type { get; set; }
-    public string? Dimension { get; set; }
-
-    public string[]? LinksToResidents { get; set; }
-
-    public string? Url { get; set; }
-
-    public DateTime? Created { get; set; }
+    public int externalId { get; set; }
+    public string name { get; set; }
+    public string type { get; set; }
+    public string? dimension { get; set; }
+    public string[]? linksToResidents { get; set; }
+    public string? url { get; set; }
+    public DateTime? created { get; set; }
 }
 
