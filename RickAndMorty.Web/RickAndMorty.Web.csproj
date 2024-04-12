@@ -10,15 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RickAndMorty.Web.Core\RickAndMorty.Web.Core.csproj" />
     <ProjectReference Include="..\RickAndMorty.Web.Models\RickAndMorty.Web.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Settings\" />
   </ItemGroup>
 
 </Project>
