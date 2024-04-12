@@ -2,22 +2,22 @@
 namespace RickAndMorty.Web.Models;
 public class CharacterResponse
 {
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public string Status { get; set; }
-    public string? Species { get; set; }
+    public int id { get; set; }
+    public string? name { get; set; }
+    public string status { get; set; }
+    public string? species { get; set; }
 
-    public string? Type { get; set; }
+    public string? type { get; set; }
 
     /// <summary>
     /// possible values ('Female', 'Male', 'Genderless' or 'unknown').
     /// </summary>
-    public string? Gender { get; set; }
+    public string? gender { get; set; }
 
-    public string? Planet { get; set; }
+    public string? planet { get; set; }
 
-    public string? Image { get; set; }
-    public string[]? Episode { get; set; }
-    public string? Url { get; set; }
-    public string? Created { get; set; }
+    public string? image { get; set; }
+    public string[]? episode { get; set; }
+    public string? url { get; set; }
+    public string? created { get; set; }
 }
