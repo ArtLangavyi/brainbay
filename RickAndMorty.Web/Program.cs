@@ -8,6 +8,14 @@ using RickAndMorty.Web.Core.Settings;
 using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Configuration(hostingContext.Configuration)
+        .Enrich.FromLogContext()
+        .WriteTo.Console();
+});
+
 var socketsHttpHandler = new SocketsHttpHandler()
 {
     SslOptions = new System.Net.Security.SslClientAuthenticationOptions()
