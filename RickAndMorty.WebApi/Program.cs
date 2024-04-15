@@ -1,9 +1,13 @@
+using Amazon.Runtime.Internal.Util;
+
 using Elastic.Apm.NetCoreAll;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 using RickAndMorty.Shared.Helpers;
 using RickAndMorty.Shared.Services;
+using RickAndMorty.Shared.Services.Abstractions;
 using RickAndMorty.WebApi.Core.Mappers;
 using RickAndMorty.WebApi.Core.Services.Abstractions;
 using RickAndMorty.WebApi.Core.Services.Character;
@@ -26,6 +30,7 @@ builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
         .WriteTo.Console();
 });
 
+builder.Services.AddMemoryCache();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -41,8 +46,11 @@ builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
 builder.Services.AddTransient<ICharacterService, CharacterService>();
 builder.Services.AddTransient<ILocationService, LocationService>();
 
+builder.Services.AddTransient<ICacheService, CacheService>(); 
+
 var logger = LogService.AddLogger(builder.Configuration, "RickAndMorty_WebApi");
 Log.Logger = logger.CreateLogger();
+
 
 var app = builder.Build();
 
@@ -73,14 +81,34 @@ app.Run();
 
 static void CreateRequestMapForCharacters(WebApplication app)
 {
-    app.MapGet("/characters", async (ICharacterService characterService, string? planet) =>
+    app.MapGet("/characters", async (ICharacterService characterService, ICacheService cacheService, string? planet) =>
     {
+        var cacheKey = "characters";
+        
+        if(!string.IsNullOrEmpty(planet))
+        {
+            cacheKey = $"characters_{planet}";
+        }
+
         var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Characters", "GET");
 
-        CharacterResponse[] characters = [];
+        CharacterResponse[]? characters = null;
+
         try
         {
-            characters = await characterService.GetAllCharactersAsync(planet);
+            characters = cacheService.GetObjectFromCache<CharacterResponse[]>(cacheKey);
+
+            if (characters == null)
+            {
+                characters = await characterService.GetAllCharactersAsync(planet);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromSeconds(30))
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+                cacheService.SetObjectInCache<CharacterResponse[]>(cacheKey, 30, 1, characters);
+            }
+            
         }
         catch (Exception ex)
         {
@@ -132,14 +160,25 @@ static void CreateRequestMapForCharacters(WebApplication app)
 
 static void CreateRequestMapForLocations(WebApplication app)
 {
-    app.MapGet("/planets", async (ILocationService locationService) =>
+    app.MapGet("/planets", async (ILocationService locationService, ICacheService cacheService) =>
     {
         var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Planets", "GET");
 
-        LocationResponse[] planets = [];
+        LocationResponse[]? planets = [];
         try
         {
-            planets = await locationService.GetAllPlanetsAsync();
+            const string cacheKey = "planets";
+
+            planets = cacheService.GetObjectFromCache<LocationResponse[]>(cacheKey);
+
+            if (planets == null)
+            {
+                planets = await locationService.GetAllPlanetsAsync();
+
+                cacheService.SetObjectInCache<LocationResponse[]>(cacheKey, 30, 1, planets);
+            }
+
+          
         }
         catch (Exception ex)
         {

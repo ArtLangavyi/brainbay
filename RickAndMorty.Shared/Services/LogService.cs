@@ -6,6 +6,7 @@ using Serilog;
 using Serilog.Formatting.Compact;
 using Serilog.Sinks.SystemConsole.Themes;
 
+
 namespace RickAndMorty.Shared.Services;
 public static class LogService
 {
