@@ -55,14 +55,31 @@ namespace RickAndMorty.Web.Controllers
                 return View(model);
             }
 
-            var request = model.MapAddCharacterViewModelToAddCharacterRequest();
+            var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Planets", "GET");
 
-            var newCharacterId = await _characterService.AddCharacterAsync(request);
-
-            if (newCharacterId == 0)
+            int newCharacterId = 0;
+            try
             {
-                ModelState.AddModelError("Name", "Huston, we have a problem!");
+                var request = model.MapAddCharacterViewModelToAddCharacterRequest();
+
+                newCharacterId = await _characterService.AddCharacterAsync(request);
+
+                if (newCharacterId == 0)
+                {
+                    ModelState.AddModelError("Name", "Huston, we have a problem!");
+
+                    apmTransaction.CaptureError($"Couldn't save new character with name: {model.Name}", nameof(AddCharacterAsync), null);
+                }
             }
+            catch (Exception ex)
+            {
+                apmTransaction.CaptureException(ex);
+            }
+            finally
+            {
+                apmTransaction.End();
+            }
+
 
             return View("CharacterCreated", newCharacterId);
         }

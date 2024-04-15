@@ -1,6 +1,11 @@
+using Elastic.Apm.NetCoreAll;
+
+using RickAndMorty.Shared.Services;
 using RickAndMorty.Web.Core.Clients;
 using RickAndMorty.Web.Core.Services;
 using RickAndMorty.Web.Core.Settings;
+
+using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 var socketsHttpHandler = new SocketsHttpHandler()
@@ -27,10 +32,21 @@ builder.Services.AddTransient<IRickAndMortyWebApiFactory, RickAndMortyWebApiFact
 builder.Services.AddTransient<ILocationService, LocationService>();
 builder.Services.AddTransient<ICharacterService, CharacterService>();
 
+var logger = LogService.AddLogger(builder.Configuration, "RickAndMorty_Web");
+Log.Logger = logger.CreateLogger();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+if (builder.Configuration.GetSection("ElasticApm").GetValue<bool>("Enabled"))
+{
+    app.UseHttpsRedirection();
+
+    app.UseAllElasticApm(builder.Configuration);
+}
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
