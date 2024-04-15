@@ -20,7 +20,7 @@ public class CharacterRepository(RickAndMortyContext context) : ICharacterReposi
         if (!string.IsNullOrEmpty(planet))
         {
             query = query
-                .Where(e => e.Location.Type == PlanetLocationType && e.Location.Name == planet);
+                .Where(e => e.Location != null && e.Location.Type == PlanetLocationType && e.Location.Name == planet);
         }
 
         var result = await query.ToArrayAsync(cancellationToken);
@@ -30,14 +30,19 @@ public class CharacterRepository(RickAndMortyContext context) : ICharacterReposi
 
     public async Task<int> AddCharacterAsync(AddCharactersRequest request, CancellationToken cancellationToken = default)
     {
-        var entity = request.MapToCharacter();
+        try
+        {
+            var entity = request.MapToCharacter(isAddedManual: true);
 
-        entity.IsAddedManual = true;
+            await _context.Characters.AddAsync(entity, cancellationToken);
 
-        await _context.Characters.AddAsync(entity, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return entity.Id;
+            return entity.Id;
+        }
+        catch(Exception ex)
+        {
+            throw new Exception("Error while adding character", ex);
+        }
     }
 }
