@@ -1,5 +1,9 @@
+using Elastic.Apm.NetCoreAll;
+
 using Microsoft.EntityFrameworkCore;
 
+using RickAndMorty.Shared.Helpers;
+using RickAndMorty.Shared.Services;
 using RickAndMorty.WebApi.Core.Mappers;
 using RickAndMorty.WebApi.Core.Services.Abstractions;
 using RickAndMorty.WebApi.Core.Services.Character;
@@ -9,6 +13,8 @@ using RickAndMorty.WebApi.Data.Repositories.Abstractions;
 using RickAndMorty.WebApi.Models.Requests.Characters;
 using RickAndMorty.WebApi.Models.Responses.Characters;
 using RickAndMorty.WebApi.Models.Responses.Locations;
+
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +32,9 @@ builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
 builder.Services.AddTransient<ICharacterService, CharacterService>();
 builder.Services.AddTransient<ILocationService, LocationService>();
 
+var logger = LogService.AddLogger(builder.Configuration, "RickAndMorty_WebApi");
+Log.Logger = logger.CreateLogger();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -34,7 +43,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (builder.Configuration.GetSection("ElasticApm").GetValue<bool>("Enabled"))
+{
+    app.UseHttpsRedirection();
+
+    app.UseAllElasticApm(builder.Configuration);
+}
+
+
+app.UseSerilogRequestLogging();
+
 
 CreateRequestMapForCharacters(app);
 
@@ -48,7 +66,22 @@ static void CreateRequestMapForCharacters(WebApplication app)
 {
     app.MapGet("/characters", async (ICharacterService characterService, string? planet) =>
     {
-        var characters = await characterService.GetAllCharactersAsync(planet);
+        var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Characters", "GET");
+
+        CharacterResponse[] characters = [];
+        try
+        {
+            characters = await characterService.GetAllCharactersAsync(planet);
+        }
+        catch (Exception ex)
+        {
+            apmTransaction.CaptureException(ex);
+        }
+        finally
+        {
+            apmTransaction.End();
+        }
+
         return TypedResults.Ok(characters);
     })
     .WithName("Get All Characters")
@@ -62,8 +95,22 @@ static void CreateRequestMapForCharacters(WebApplication app)
 
     app.MapPost("/characters", async (ICharacterService characterService, AddCharactersRequest request) =>
     {
-        var id = await characterService.AddCharacterAsync(request);
-        return TypedResults.Ok(id);
+        var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Add Character", "POST");
+
+        int? addedCharacterId = default;
+        try
+        {
+            addedCharacterId = await characterService.AddCharacterAsync(request);
+        }
+        catch (Exception ex)
+        {
+            apmTransaction.CaptureException(ex);
+        }
+        finally
+        {
+            apmTransaction.End();
+        }
+        return TypedResults.Ok(addedCharacterId);
     })
     .WithName("Add Character")
     .WithOpenApi(operation => new(operation)
@@ -78,7 +125,21 @@ static void CreateRequestMapForLocations(WebApplication app)
 {
     app.MapGet("/planets", async (ILocationService locationService) =>
     {
-        var planets = await locationService.GetAllPlanetsAsync();
+        var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Planets", "GET");
+
+        LocationResponse[] planets = [];
+        try
+        {
+            planets = await locationService.GetAllPlanetsAsync();
+        }
+        catch (Exception ex)
+        {
+            apmTransaction.CaptureException(ex);
+        }
+        finally
+        {
+            apmTransaction.End();
+        }
         return TypedResults.Ok(planets);
     })
     .WithName("Get All Planets")
