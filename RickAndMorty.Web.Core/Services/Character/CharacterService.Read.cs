@@ -16,8 +16,7 @@ public partial class CharacterService
 
         if (charactersResponse is not null)
         {
-            var characters = await ConversionHelper.ConvertResponseToObjectAsync<CharacterResponse[]>(charactersResponse);
-            return characters;
+            return await ConversionHelper.ConvertResponseToObjectAsync<CharacterResponse[]>(charactersResponse);
         }
 
         return [];

@@ -21,6 +21,9 @@ using RickAndMorty.WebApi.Models.Responses.Locations;
 
 using Serilog;
 
+const int SlidingExpirationInSeconds = 30;
+const int AbsoluteExpirationInMinutes = 1;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
@@ -82,7 +85,7 @@ app.Run();
 
 static void CreateRequestMapForCharacters(WebApplication app)
 {
-    app.MapGet("/characters", async (ICharacterService characterService, ICacheService cacheService, HttpContext context, string? planet) =>
+    app.MapGet("/characters", async (ICharacterService characterService, ICacheService cacheService, HttpContext context, ILogger<Program> _logger, string? planet) =>
     {
         var cacheKey = "characters";
         
@@ -103,7 +106,7 @@ static void CreateRequestMapForCharacters(WebApplication app)
             {
                 characters = await characterService.GetAllCharactersAsync(planet);
 
-                cacheService.SetObjectInCache<CharacterResponse[]>(cacheKey, 30, 1, characters);
+                cacheService.SetObjectInCache<CharacterResponse[]>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, characters);
 
                 context.Response.Headers.Append("from-database", "true");
             }
@@ -111,6 +114,8 @@ static void CreateRequestMapForCharacters(WebApplication app)
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, $"Huston, we have a problem with {nameof(characterService.GetAllCharactersAsync)}!");
+
             apmTransaction.CaptureException(ex);
         }
         finally
@@ -129,7 +134,7 @@ static void CreateRequestMapForCharacters(WebApplication app)
     })
     .Produces<IEnumerable<CharacterResponse>>();
 
-    app.MapPost("/characters", async (ICharacterService characterService, AddCharactersRequest request) =>
+    app.MapPost("/characters", async (ICharacterService characterService, AddCharactersRequest request, ILogger<Program> _logger) =>
     {
         var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Add Character", "POST");
 
@@ -140,6 +145,7 @@ static void CreateRequestMapForCharacters(WebApplication app)
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, $"Huston, we have a problem with {nameof(characterService.AddCharacterAsync)}!");
             apmTransaction.CaptureException(ex);
         }
         finally
@@ -159,7 +165,7 @@ static void CreateRequestMapForCharacters(WebApplication app)
 
 static void CreateRequestMapForLocations(WebApplication app)
 {
-    app.MapGet("/planets", async (ILocationService locationService, ICacheService cacheService, HttpContext context) =>
+    app.MapGet("/planets", async (ILocationService locationService, ICacheService cacheService, HttpContext context, ILogger<Program> _logger) =>
     {
         var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Planets", "GET");
 
@@ -174,15 +180,15 @@ static void CreateRequestMapForLocations(WebApplication app)
             {
                 planets = await locationService.GetAllPlanetsAsync();
 
-                cacheService.SetObjectInCache<LocationResponse[]>(cacheKey, 30, 1, planets);
+                cacheService.SetObjectInCache<LocationResponse[]>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, planets);
 
                 context.Response.Headers.Append("from-database", "true");
-            }
-
-          
+            }          
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, $"Huston, we have a problem with {nameof(locationService.GetAllPlanetsAsync)}!");
+
             apmTransaction.CaptureException(ex);
         }
         finally

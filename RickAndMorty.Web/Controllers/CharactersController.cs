@@ -67,6 +67,7 @@ namespace RickAndMorty.Web.Controllers
                 {
                     ModelState.AddModelError("Name", "Huston, we have a problem!");
 
+                    _logger.LogError("Couldn't save new character with name: {name}", model.Name);
                     apmTransaction.CaptureError($"Couldn't save new character with name: {model.Name}", nameof(AddCharacterAsync), null);
                 }
             }
