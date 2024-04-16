@@ -30,15 +30,10 @@ public class CharacterRepository(RickAndMortyContext context) : ICharacterReposi
         var result = await query.Skip(skip)
                              .Take(pageSize).ToArrayAsync(cancellationToken);
 
-        var totalPages = await GetTotalPagesAsync<Character>(_context, pageSize);
+        var totalCount = await query.CountAsync();
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
         return (result, totalPages);
-    }
-
-    private async Task<int> GetTotalPagesAsync<T>(DbContext context, int pageSize) where T : class
-    {
-        int totalCount = await context.Set<T>().CountAsync();
-        return (int)Math.Ceiling(totalCount / (double)pageSize);
     }
 
     public async Task<int> AddCharacterAsync(AddCharactersRequest request, CancellationToken cancellationToken = default)

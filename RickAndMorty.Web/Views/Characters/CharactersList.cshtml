@@ -75,7 +75,7 @@ else
                     <td>
                         @if (!string.IsNullOrEmpty(item.planet))
                         {
-                            <a href="/characters?planet=@item.planet">View only planet @item.planet</a>
+                            @Html.ActionLink($"View only planet {item.planet}", "CharactersList", "Characters", new { planet = @item.planet })
                         }
                     </td>
                 </tr>

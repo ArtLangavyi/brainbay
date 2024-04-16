@@ -15,7 +15,7 @@ public static class CharacterResponseMapper
             Type = character.Type,
             Url = character.Url,
             Image = character.Image,
-            Planet = character.Location?.Name,
+            Planet = (character.Location?.Type == "Planet") ? character.Location?.Name : null,
             Status = ((CharacterStatus)character.Status).ToString(),
         };
     }
