@@ -105,12 +105,10 @@ static void CreateRequestMapForCharacters(WebApplication app)
             characters = cacheService.GetObjectFromCache<CharacterResponseBase>(cacheKey);
 
             if (characters == null)
-            {
-                var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}";
-                
+            {                
                 const int pageSize = 10;
 
-                characters = await characterService.GetAllCharactersAsync(planet, pageNumber, pageSize, baseUrl);
+                characters = await characterService.GetAllCharactersAsync(planet, pageNumber, pageSize);
 
                 cacheService.SetObjectInCache<CharacterResponseBase>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, characters);
 

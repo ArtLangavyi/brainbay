@@ -6,6 +6,6 @@ namespace RickAndMorty.WebApi.Core.Services.Abstractions;
 public interface ICharacterService
 {
     Task<int> AddCharacterAsync(AddCharactersRequest request, CancellationToken cancellationToken = default);
-    Task<CharacterResponseBase> GetAllCharactersAsync(string? planet = "", int pageNumber = 1, int pageSize = 10, string baseUrl = "", CancellationToken cancellationToken = default);
+    Task<CharacterResponseBase> GetAllCharactersAsync(string? planet = "", int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default);
 }
 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RickAndMorty.Web.Models.CharacterViewModel>
+﻿@model RickAndMorty.Web.Models.CharactersListViewModel;
 
 @{
     ViewData["Title"] = "CharactersList";
@@ -11,47 +11,76 @@
     <a asp-action="AddCharacter">Create New</a>
 </p>
 
-<table class="table">
-    <thead>
+@if (Model == null || Model.Characters.Count() == 0)
+{
+    <p>No characters found</p>
+}
+else
+{
+    <table>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.planet)
-            </th>
-            <th></th>
+            <td>
+                @if(Model.PreviousPageUrl != null)
+                {
+                   
+                    <a href="@Model.PreviousPageUrl">Previous page</a>
+                    @:<<
+                }
+            </td>
+            <td>
+                @if(Model.NextPageUrl != null)
+                {
+                 @:>> 
+                 <a href="@Model.NextPageUrl">Next page</a>
+                }
+            </td>
         </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    </table>
+
+
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.status)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.planet)
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.planet))
-                    {
-                        <a href="/characters?planet=@item.planet">View only planet @item.planet</a>
-                    }
-                </td>
+                <th>
+                    id
+                </th>
+                <th>
+                    name
+                </th>
+                <th>
+                    status
+                </th>
+                <th>
+                    planet
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Characters)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.planet)
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.planet))
+                        {
+                            <a href="/characters?planet=@item.planet">View only planet @item.planet</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

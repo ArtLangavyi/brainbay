@@ -1,3 +1,5 @@
+using Elastic.Apm.Api;
+
 using Microsoft.AspNetCore.Mvc;
 
 using RickAndMorty.Web.Attributes;
@@ -22,19 +24,17 @@ namespace RickAndMorty.Web.Controllers
         }
 
         [HttpGet]   
-        public async Task<IActionResult> CharactersListAsync(string? planet = default)
+        public async Task<IActionResult> CharactersListAsync(int pageNumber = 1, string? planet = default)
         {
-            IEnumerable<CharacterViewModel> viewModel = [];
+            var characterResponseBase = await _characterService.GetAllCharactersAsync(pageNumber, planet);
 
-            var characters = await _characterService.GetAllCharactersAsync(planet);
-
-            if (characters is null)
+            if (characterResponseBase is null)
             {
-                return View(viewModel);
+                return View();
             }
+            var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-            viewModel = characters.Select(e => e.MapCharacterToViewModel());
-
+            var viewModel = characterResponseBase.MapCharacterResponseBaseToCharactersListViewModel(baseUrl);
             return View(viewModel);
         }
 
