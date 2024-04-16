@@ -57,7 +57,7 @@ public class BaseTest
 
         var rickAndMortyApiFactory = new RickAndMortyApiFactory(clientFactoryMock.Object, config);
 
-        _importService = new ImportService(rickAndMortyApiFactory, _rickAndMortyApiSettings, _locationRepository, _characterRepository, _mapper);
+        _importService = new ImportService(_rickAndMortyApiSettings, _locationRepository, _characterRepository, _mapper, clientFactoryMock.Object);
     }
 
     [TearDown]

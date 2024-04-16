@@ -1,6 +1,7 @@
 ﻿using RickAndMorty.Net.Api.Models.Dto;
 using RickAndMorty.Shared;
 
+using RickAndMortyApiCrawler.Core.Clients;
 using RickAndMortyApiCrawler.Core.Clients.RickAndMortyApi.Models.Responses;
 using RickAndMortyApiCrawler.Core.Models.ImportCharacter;
 using RickAndMortyApiCrawler.Core.Services.Abstractions;
@@ -43,7 +44,7 @@ public partial class ImportService : IImportService
 
     public async Task<List<CharacterResponseResult>> LoadAndAddNewCharacterAsync(ImportFilter? importFilter, CancellationToken cancellationToken = default)
     {
-        using var _httpClient = rickAndMortyApiFactory.MakeHttpClient();
+        using var _httpClient = clientFactory.CreateClient(RickAndMortyApiFactory.ClientName);
         var charactersList = new List<CharacterResponseResult>();
         var url = rickAndMortyApiSettings.CharactersEndpoint;
 
@@ -118,7 +119,7 @@ public partial class ImportService : IImportService
 
     private async Task LoadAndAddNewLocationsAsync(CancellationToken cancellationToken = default)
     {
-        using var _httpClient = rickAndMortyApiFactory.MakeHttpClient();
+        using var _httpClient = clientFactory.CreateClient(RickAndMortyApiFactory.ClientName);
         var url = rickAndMortyApiSettings.LocationsEndpoint;
         while (!string.IsNullOrEmpty(url))
         {

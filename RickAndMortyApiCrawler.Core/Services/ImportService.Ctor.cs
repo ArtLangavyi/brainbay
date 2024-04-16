@@ -6,11 +6,11 @@ using RickAndMortyApiCrawler.Core.Repositories;
 using RickAndMortyApiCrawler.Core.Services.Abstractions;
 
 namespace RickAndMortyApiCrawler.Core.Services;
-public partial class ImportService(IRickAndMortyApiFactory rickAndMortyApiFactory
-    , RickAndMortyApiSettings rickAndMortyApiSettings
+public partial class ImportService(RickAndMortyApiSettings rickAndMortyApiSettings
     , ILocationRepository locationRepository
     , ICharacterRepository characterRepository
-    , IMapper mapper) : IImportService
+    , IMapper mapper
+    , IHttpClientFactory clientFactory) : IImportService
 {
     const int MaxRetries = 5;
 }
