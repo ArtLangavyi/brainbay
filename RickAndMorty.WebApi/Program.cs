@@ -1,5 +1,6 @@
 using Amazon.Runtime.Internal.Util;
 
+using Elastic.Apm.Api;
 using Elastic.Apm.NetCoreAll;
 
 using Microsoft.EntityFrameworkCore;
@@ -81,7 +82,7 @@ app.Run();
 
 static void CreateRequestMapForCharacters(WebApplication app)
 {
-    app.MapGet("/characters", async (ICharacterService characterService, ICacheService cacheService, string? planet) =>
+    app.MapGet("/characters", async (ICharacterService characterService, ICacheService cacheService, HttpContext context, string? planet) =>
     {
         var cacheKey = "characters";
         
@@ -102,11 +103,9 @@ static void CreateRequestMapForCharacters(WebApplication app)
             {
                 characters = await characterService.GetAllCharactersAsync(planet);
 
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromSeconds(30))
-                        .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
                 cacheService.SetObjectInCache<CharacterResponse[]>(cacheKey, 30, 1, characters);
+
+                context.Response.Headers.Append("from-database", "true");
             }
             
         }
@@ -160,7 +159,7 @@ static void CreateRequestMapForCharacters(WebApplication app)
 
 static void CreateRequestMapForLocations(WebApplication app)
 {
-    app.MapGet("/planets", async (ILocationService locationService, ICacheService cacheService) =>
+    app.MapGet("/planets", async (ILocationService locationService, ICacheService cacheService, HttpContext context) =>
     {
         var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Planets", "GET");
 
@@ -176,6 +175,8 @@ static void CreateRequestMapForLocations(WebApplication app)
                 planets = await locationService.GetAllPlanetsAsync();
 
                 cacheService.SetObjectInCache<LocationResponse[]>(cacheKey, 30, 1, planets);
+
+                context.Response.Headers.Append("from-database", "true");
             }
 
           

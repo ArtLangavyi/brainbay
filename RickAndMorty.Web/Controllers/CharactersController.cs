@@ -21,7 +21,7 @@ namespace RickAndMorty.Web.Controllers
             _characterService = characterService;
         }
 
-        [HttpGet]
+        [HttpGet]   
         public async Task<IActionResult> CharactersListAsync(string? planet = default)
         {
             IEnumerable<CharacterViewModel> viewModel = [];
