@@ -21,6 +21,8 @@ using RickAndMorty.WebApi.Models.Responses.Locations;
 
 using Serilog;
 
+using System.Drawing.Printing;
+
 const int SlidingExpirationInSeconds = 30;
 const int AbsoluteExpirationInMinutes = 1;
 
@@ -85,28 +87,32 @@ app.Run();
 
 static void CreateRequestMapForCharacters(WebApplication app)
 {
-    app.MapGet("/characters", async (ICharacterService characterService, ICacheService cacheService, HttpContext context, ILogger<Program> _logger, string? planet) =>
+    app.MapGet("/characters", async (ICharacterService characterService, ICacheService cacheService, HttpContext context, ILogger<Program> _logger, int pageNumber = 1, string? planet = null) =>
     {
-        var cacheKey = "characters";
+        var cacheKey = $"characters_page{pageNumber}";
         
         if(!string.IsNullOrEmpty(planet))
         {
-            cacheKey = $"characters_{planet}";
+            cacheKey += $"_{planet}";
         }
 
         var apmTransaction = Elastic.Apm.Agent.Tracer.StartTransaction("Get All Characters", "GET");
 
-        CharacterResponse[]? characters = null;
+        CharacterResponseBase? characters = null;
 
         try
         {
-            characters = cacheService.GetObjectFromCache<CharacterResponse[]>(cacheKey);
+            characters = cacheService.GetObjectFromCache<CharacterResponseBase>(cacheKey);
 
             if (characters == null)
             {
-                characters = await characterService.GetAllCharactersAsync(planet);
+                var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}";
+                
+                const int pageSize = 10;
 
-                cacheService.SetObjectInCache<CharacterResponse[]>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, characters);
+                characters = await characterService.GetAllCharactersAsync(planet, pageNumber, pageSize, baseUrl);
+
+                cacheService.SetObjectInCache<CharacterResponseBase>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, characters);
 
                 AppendFromDatabaseHeader(context);
             }
