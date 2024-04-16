@@ -108,7 +108,7 @@ static void CreateRequestMapForCharacters(WebApplication app)
 
                 cacheService.SetObjectInCache<CharacterResponse[]>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, characters);
 
-                context.Response.Headers.Append("from-database", "true");
+                AppendFromDatabaseHeader(context);
             }
             
         }
@@ -182,8 +182,8 @@ static void CreateRequestMapForLocations(WebApplication app)
 
                 cacheService.SetObjectInCache<LocationResponse[]>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, planets);
 
-                context.Response.Headers.Append("from-database", "true");
-            }          
+                AppendFromDatabaseHeader(context);
+            }
         }
         catch (Exception ex)
         {
@@ -205,4 +205,9 @@ static void CreateRequestMapForLocations(WebApplication app)
         Description = "Get All Planets"
     })
     .Produces<LocationResponse[]>();
+}
+
+static void AppendFromDatabaseHeader(HttpContext context)
+{
+    context.Response.Headers.Append("from-database", "true");
 }
