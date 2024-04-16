@@ -34,7 +34,7 @@ namespace RickAndMorty.Web.Controllers
             }
             var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.Path}";
 
-            var viewModel = characterResponseBase.MapCharacterResponseBaseToCharactersListViewModel(baseUrl);
+            var viewModel = characterResponseBase.MapCharacterResponseBaseToCharactersListViewModel(baseUrl, planet);
             return View(viewModel);
         }
 

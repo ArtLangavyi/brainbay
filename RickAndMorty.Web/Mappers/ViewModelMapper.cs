@@ -8,12 +8,24 @@ public static class ViewModelMapper
         return new CharacterViewModel(character.id, character.name, character.status, character.planet);
     }
 
-    public static CharactersListViewModel MapCharacterResponseBaseToCharactersListViewModel(this CharacterResponseBase characterResponseBase, string baseUrl)
+    public static CharactersListViewModel MapCharacterResponseBaseToCharactersListViewModel(this CharacterResponseBase characterResponseBase, string baseUrl, string? planet = default)
     {
         var characters = characterResponseBase.characters.Select(e => e.MapCharacterToViewModel()).ToArray();
 
         var nextPageUrl = characterResponseBase.nextPageNumber.HasValue ? $"{baseUrl}?pageNumber={characterResponseBase.nextPageNumber}" : null;
         var previousPageUrl = characterResponseBase.previousPageNumber.HasValue ? $"{baseUrl}?pageNumber={characterResponseBase.previousPageNumber}" : null;
+
+        if (!string.IsNullOrWhiteSpace(planet))
+        {
+            if (nextPageUrl is not null)
+                nextPageUrl += $"&planet={planet}";
+
+            if (nextPageUrl is null && previousPageUrl is null)
+                previousPageUrl = $"{baseUrl}?planet={planet}";
+
+            if (previousPageUrl is not null)
+                previousPageUrl += $"&planet={planet}";
+        }
 
         return new CharactersListViewModel(nextPageUrl, previousPageUrl, characters);
     }
