@@ -22,7 +22,6 @@ namespace RickAndMorty.Web.Controllers
         }
 
         [HttpGet]
-        [AddHeader("from-database", "true")]
         public async Task<IActionResult> CharactersListAsync(string? planet = default)
         {
             IEnumerable<CharacterViewModel> viewModel = [];
