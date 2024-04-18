@@ -65,10 +65,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseHttpsRedirection();
 if (builder.Configuration.GetSection("ElasticApm").GetValue<bool>("Enabled"))
 {
-    app.UseHttpsRedirection();
+
 
     app.UseAllElasticApm(builder.Configuration);
 }
@@ -112,7 +112,7 @@ static void CreateRequestMapForCharacters(WebApplication app)
 
                 cacheService.SetObjectInCache<CharacterResponseBase>(cacheKey, SlidingExpirationInSeconds, AbsoluteExpirationInMinutes, characters);
 
-                AppendFromDatabaseHeader(context);
+                AppendFromDatabaseHeader(context);  
             }
             
         }
